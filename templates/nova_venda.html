@@ -6,6 +6,13 @@
 <div class="pdv-layout">
     <!-- ═══ PAINEL ESQUERDO ═══ -->
     <div class="pdv-left">
+        <div class="pdv-top-bar">
+            <a href="{{ url_for('main.dashboard') }}" class="pdv-back-btn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Voltar ao Dashboard
+            </a>
+        </div>
+
         <div class="pdv-section">
             <h2 class="pdv-title">Buscar produtos</h2>
             <div class="pdv-search">
@@ -13,7 +20,7 @@
                 <input type="text" id="busca-produto" placeholder="Buscar por nome, descrição ou SKU" autocomplete="off">
             </div>
 
-            <!-- Lista de produtos (aparece ao buscar) -->
+            <!-- Lista de produtos -->
             <div id="produtos-lista" class="pdv-produtos-lista">
                 {% for p in produtos %}
                 <div class="pdv-produto-item" data-id="{{ p.id }}" data-nome="{{ p.nome }}" data-preco="{{ p.preco }}" data-estoque="{{ p.estoque }}">
@@ -24,6 +31,11 @@
                     <span class="pdv-produto-preco">R$ {{ "%.2f"|format(p.preco) }}</span>
                 </div>
                 {% endfor %}
+                {% if not produtos %}
+                <div class="pdv-produtos-empty">
+                    Nenhum produto com estoque. <a href="{{ url_for('produtos.listar') }}">Cadastre produtos</a>.
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -60,6 +72,33 @@
 
         <div id="carrinho-itens" class="pdv-carrinho-itens" style="display:none"></div>
 
+        <!-- Forma de pagamento -->
+        <div id="pagamento-section" class="pdv-pagamento" style="display:none">
+            <h3 class="pdv-pagamento-title">Forma de pagamento</h3>
+            <div class="pdv-pagamento-opcoes">
+                <label class="pdv-pag-option selected">
+                    <input type="radio" name="forma_pagamento" value="dinheiro" checked>
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Dinheiro</span>
+                </label>
+                <label class="pdv-pag-option">
+                    <input type="radio" name="forma_pagamento" value="pix">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                    <span>PIX</span>
+                </label>
+                <label class="pdv-pag-option">
+                    <input type="radio" name="forma_pagamento" value="credito">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span>Crédito</span>
+                </label>
+                <label class="pdv-pag-option">
+                    <input type="radio" name="forma_pagamento" value="debito">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M6 15h4"/></svg>
+                    <span>Débito</span>
+                </label>
+            </div>
+        </div>
+
         <!-- Inputs hidden para envio do form -->
         <div id="form-hidden-inputs"></div>
 
@@ -69,7 +108,7 @@
                 <span class="pdv-total-valor">R$<span id="total-display">0,00</span></span>
             </div>
             <button type="submit" class="btn btn-primary btn-block pdv-btn-pagamento" id="btn-pagamento" disabled>
-                Ir para o pagamento
+                Finalizar venda
             </button>
         </div>
     </div>
@@ -153,14 +192,17 @@ function renderCarrinho() {
     const itensEl = document.getElementById('carrinho-itens');
     const hiddenEl = document.getElementById('form-hidden-inputs');
     const btnPag = document.getElementById('btn-pagamento');
+    const pagSection = document.getElementById('pagamento-section');
 
     if (carrinho.length === 0) {
         vazioEl.style.display = '';
         itensEl.style.display = 'none';
+        pagSection.style.display = 'none';
         btnPag.disabled = true;
     } else {
         vazioEl.style.display = 'none';
         itensEl.style.display = '';
+        pagSection.style.display = '';
         btnPag.disabled = false;
     }
 
@@ -199,5 +241,13 @@ function renderCarrinho() {
     document.getElementById('total-display').textContent = total.toFixed(2).replace('.', ',');
     document.getElementById('total-count').textContent = totalItens;
 }
+
+// ── Forma de pagamento visual ──
+document.querySelectorAll('.pdv-pag-option input').forEach(radio => {
+    radio.addEventListener('change', () => {
+        document.querySelectorAll('.pdv-pag-option').forEach(el => el.classList.remove('selected'));
+        radio.closest('.pdv-pag-option').classList.add('selected');
+    });
+});
 </script>
 {% endblock %}

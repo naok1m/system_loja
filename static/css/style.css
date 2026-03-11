@@ -68,7 +68,9 @@ a:hover { text-decoration: underline; }
     font-weight: 700;
     font-size: 1.2rem;
     color: #4361ee;
+    text-decoration: none;
 }
+.nav-brand:hover { text-decoration: none; }
 
 .nav-links { display: flex; gap: 0.5rem; align-items: center; }
 
@@ -93,6 +95,19 @@ a:hover { text-decoration: underline; }
 .btn-logout:hover {
     background: #fdecea !important;
 }
+
+.nav-pdv {
+    background: #4361ee !important;
+    color: #fff !important;
+    border-radius: 6px;
+}
+.nav-pdv:hover, .nav-pdv.active {
+    background: #3a56d4 !important;
+    color: #fff !important;
+}
+
+/* ──────── Buttons extras ──────── */
+.btn-lg { padding: 0.75rem 1.5rem; font-size: 1rem; }
 
 /* ──────── Container ──────── */
 .container {
@@ -551,4 +566,187 @@ tr:hover td { background: #fafbff; }
     .venda-actions { flex-direction: column; }
     .venda-total { margin-left: 0; }
     .page-header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+    .dash-header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+    .dash-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════
+   Dashboard Hub
+   ══════════════════════════════════════ */
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dash-header h1 { font-size: 1.5rem; margin-bottom: 0.15rem; }
+.dash-subtitle { color: #9ca3af; font-size: 0.9rem; }
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.dash-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dash-shortcuts, .dash-recent {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1.25rem;
+}
+
+.dash-shortcuts h2, .dash-recent h2 {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 0.75rem;
+}
+
+.dash-shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    color: #374151;
+    text-decoration: none;
+    transition: background 0.15s;
+    margin-bottom: 0.25rem;
+}
+.dash-shortcut-item:hover { background: #f0f4ff; text-decoration: none; }
+.dash-shortcut-item svg { color: #4361ee; flex-shrink: 0; }
+
+.dash-shortcut-pdv {
+    background: #eef1ff;
+    border: 1px solid #c7d2fe;
+}
+.dash-shortcut-pdv:hover { background: #dde3ff; }
+
+.dash-shortcut-label { font-weight: 600; font-size: 0.95rem; display: block; }
+.dash-shortcut-desc { font-size: 0.8rem; color: #9ca3af; }
+
+.dash-recent-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.1s;
+}
+.dash-recent-item:last-child { border-bottom: none; }
+.dash-recent-item:hover { text-decoration: none; background: #fafbff; border-radius: 6px; padding: 0.6rem 0.5rem; }
+
+.dash-recent-info { display: flex; gap: 0.75rem; align-items: center; }
+.dash-recent-id { font-weight: 600; color: #4361ee; }
+.dash-recent-date { font-size: 0.85rem; color: #9ca3af; }
+
+.dash-recent-right { display: flex; align-items: center; gap: 0.75rem; }
+.dash-recent-total { font-weight: 600; }
+
+.dash-empty { color: #9ca3af; font-size: 0.9rem; text-align: center; padding: 1rem 0; }
+
+/* ══════════════════════════════════════
+   Badges de pagamento
+   ══════════════════════════════════════ */
+
+.badge-pagamento {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-dinheiro { background: #d4edda; color: #155724; }
+.badge-pix { background: #cce5ff; color: #004085; }
+.badge-credito { background: #fff3cd; color: #856404; }
+.badge-debito { background: #e2e3e5; color: #383d41; }
+
+.dash-badge-dinheiro { background: #d4edda; color: #155724; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; }
+.dash-badge-pix { background: #cce5ff; color: #004085; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; }
+.dash-badge-credito { background: #fff3cd; color: #856404; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; }
+.dash-badge-debito { background: #e2e3e5; color: #383d41; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; }
+
+/* ══════════════════════════════════════
+   PDV - Forma de pagamento
+   ══════════════════════════════════════ */
+
+.pdv-top-bar {
+    margin-bottom: 1rem;
+}
+
+.pdv-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #4361ee;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding: 0.4rem 0;
+    transition: color 0.15s;
+}
+.pdv-back-btn:hover { color: #3a56d4; text-decoration: none; }
+
+.pdv-produtos-empty {
+    padding: 1.5rem;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.pdv-pagamento {
+    padding: 1rem 0 0;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 0.5rem;
+}
+
+.pdv-pagamento-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.6rem;
+}
+
+.pdv-pagamento-opcoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.pdv-pag-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.pdv-pag-option input { display: none; }
+.pdv-pag-option svg { color: #9ca3af; flex-shrink: 0; transition: color 0.15s; }
+
+.pdv-pag-option:hover { border-color: #4361ee; }
+
+.pdv-pag-option.selected {
+    border-color: #4361ee;
+    background: #eef1ff;
+}
+.pdv-pag-option.selected svg { color: #4361ee; }

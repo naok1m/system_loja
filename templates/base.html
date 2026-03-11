@@ -10,11 +10,12 @@
 <body>
     {% if current_user.is_authenticated %}
     <nav class="navbar">
-        <div class="nav-brand">{{ current_user.nome_loja }}</div>
+        <a href="{{ url_for('main.dashboard') }}" class="nav-brand">{{ current_user.nome_loja }}</a>
         <div class="nav-links">
             <a href="{{ url_for('main.dashboard') }}" class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('vendas.nova') }}" class="nav-pdv {% if request.endpoint == 'vendas.nova' %}active{% endif %}">PDV</a>
             <a href="{{ url_for('produtos.listar') }}" class="{% if 'produtos' in request.endpoint %}active{% endif %}">Produtos</a>
-            <a href="{{ url_for('vendas.listar') }}" class="{% if 'vendas' in request.endpoint %}active{% endif %}">Vendas</a>
+            <a href="{{ url_for('vendas.listar') }}" class="{% if request.endpoint == 'vendas.listar' or request.endpoint == 'vendas.detalhe' %}active{% endif %}">Vendas</a>
             <a href="{{ url_for('auth.logout') }}" class="btn-logout">Sair</a>
         </div>
     </nav>

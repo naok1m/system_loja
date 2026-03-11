@@ -95,6 +95,9 @@ def dashboard():
         ).scalar()
         valores.append(float(total_dia))
 
+    produtos = Produto.query.filter_by(user_id=current_user.id).filter(Produto.estoque > 0).all()
+    ultimas_vendas = Venda.query.filter_by(user_id=current_user.id).order_by(Venda.criado_em.desc()).limit(5).all()
+
     return render_template(
         'dashboard.html',
         vendas_hoje=vendas_hoje,
@@ -103,6 +106,8 @@ def dashboard():
         total_vendas=total_vendas,
         labels=labels,
         valores=valores,
+        produtos=produtos,
+        ultimas_vendas=ultimas_vendas,
     )
 
 
@@ -190,12 +195,17 @@ def nova():
     if request.method == 'POST':
         produtos_ids = request.form.getlist('produto_id')
         quantidades = request.form.getlist('quantidade')
+        forma_pagamento = request.form.get('forma_pagamento', 'dinheiro')
+
+        formas_validas = ('dinheiro', 'pix', 'credito', 'debito')
+        if forma_pagamento not in formas_validas:
+            forma_pagamento = 'dinheiro'
 
         if not produtos_ids:
             flash('Adicione pelo menos um produto.', 'danger')
             return redirect(url_for('vendas.nova'))
 
-        venda = Venda(user_id=current_user.id, total=0)
+        venda = Venda(user_id=current_user.id, total=0, forma_pagamento=forma_pagamento)
         db.session.add(venda)
         db.session.flush()
 

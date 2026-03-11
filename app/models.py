@@ -37,6 +37,7 @@ class Venda(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total = db.Column(db.Float, nullable=False, default=0)
+    forma_pagamento = db.Column(db.String(30), nullable=False, default='dinheiro')
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
 
     itens = db.relationship('ItemVenda', backref='venda', lazy=True)

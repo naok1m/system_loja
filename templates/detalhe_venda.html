@@ -9,6 +9,7 @@
 
 <div class="detalhe-info">
     <p><strong>Data:</strong> {{ venda.criado_em.strftime('%d/%m/%Y %H:%M') }}</p>
+    <p><strong>Pagamento:</strong> <span class="badge-pagamento badge-{{ venda.forma_pagamento }}">{{ venda.forma_pagamento|capitalize }}</span></p>
     <p><strong>Total:</strong> R$ {{ "%.2f"|format(venda.total) }}</p>
 </div>
 

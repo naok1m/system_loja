@@ -6,11 +6,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Dashboard</h1>
-    <p>Bem-vindo, {{ current_user.nome }}!</p>
+<div class="dash-header">
+    <div>
+        <h1>Olá, {{ current_user.nome }}!</h1>
+        <p class="dash-subtitle">{{ current_user.nome_loja }}</p>
+    </div>
+    <a href="{{ url_for('vendas.nova') }}" class="btn btn-primary btn-lg">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        Nova Venda (PDV)
+    </a>
 </div>
 
+<!-- Cards de resumo -->
 <div class="cards">
     <div class="card card-blue">
         <h3>Vendas Hoje</h3>
@@ -30,9 +37,61 @@
     </div>
 </div>
 
-<div class="chart-container">
-    <h2>Vendas dos Últimos 7 Dias</h2>
-    <canvas id="vendasChart"></canvas>
+<!-- Grid: Gráfico + Atalhos -->
+<div class="dash-grid">
+    <div class="chart-container">
+        <h2>Vendas dos Últimos 7 Dias</h2>
+        <canvas id="vendasChart"></canvas>
+    </div>
+
+    <div class="dash-sidebar">
+        <!-- Atalhos rápidos -->
+        <div class="dash-shortcuts">
+            <h2>Ações rápidas</h2>
+            <a href="{{ url_for('vendas.nova') }}" class="dash-shortcut-item dash-shortcut-pdv">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                <div>
+                    <span class="dash-shortcut-label">Abrir PDV</span>
+                    <span class="dash-shortcut-desc">Iniciar nova venda</span>
+                </div>
+            </a>
+            <a href="{{ url_for('produtos.listar') }}" class="dash-shortcut-item">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <div>
+                    <span class="dash-shortcut-label">Produtos</span>
+                    <span class="dash-shortcut-desc">Gerenciar catálogo</span>
+                </div>
+            </a>
+            <a href="{{ url_for('vendas.listar') }}" class="dash-shortcut-item">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <div>
+                    <span class="dash-shortcut-label">Vendas</span>
+                    <span class="dash-shortcut-desc">Histórico completo</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Últimas vendas -->
+        <div class="dash-recent">
+            <h2>Últimas vendas</h2>
+            {% if ultimas_vendas %}
+                {% for v in ultimas_vendas %}
+                <a href="{{ url_for('vendas.detalhe', id=v.id) }}" class="dash-recent-item">
+                    <div class="dash-recent-info">
+                        <span class="dash-recent-id">#{{ v.id }}</span>
+                        <span class="dash-recent-date">{{ v.criado_em.strftime('%d/%m %H:%M') }}</span>
+                    </div>
+                    <div class="dash-recent-right">
+                        <span class="dash-recent-badge dash-badge-{{ v.forma_pagamento }}">{{ v.forma_pagamento|capitalize }}</span>
+                        <span class="dash-recent-total">R$ {{ "%.2f"|format(v.total) }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p class="dash-empty">Nenhuma venda ainda.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}
 

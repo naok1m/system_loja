@@ -14,6 +14,7 @@
                 <th>#</th>
                 <th>Data</th>
                 <th>Itens</th>
+                <th>Pagamento</th>
                 <th>Total</th>
                 <th>Ações</th>
             </tr>
@@ -24,6 +25,7 @@
                 <td>{{ v.id }}</td>
                 <td>{{ v.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td>{{ v.itens|length }} item(ns)</td>
+                <td><span class="badge-pagamento badge-{{ v.forma_pagamento }}">{{ v.forma_pagamento|capitalize }}</span></td>
                 <td>R$ {{ "%.2f"|format(v.total) }}</td>
                 <td>
                     <a href="{{ url_for('vendas.detalhe', id=v.id) }}" class="btn btn-sm btn-secondary">Ver</a>
@@ -31,7 +33,7 @@
             </tr>
             {% endfor %}
             {% if not vendas %}
-            <tr><td colspan="5" class="empty">Nenhuma venda registrada.</td></tr>
+            <tr><td colspan="6" class="empty">Nenhuma venda registrada.</td></tr>
             {% endif %}
         </tbody>
     </table>
