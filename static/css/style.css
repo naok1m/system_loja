@@ -247,7 +247,7 @@ tr:hover td { background: #fafbff; }
 .modal-content h2 { margin-bottom: 1.5rem; }
 .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
 
-/* ──────── Venda Form ──────── */
+/* ──────── Venda Form (legado) ──────── */
 .venda-itens { display: flex; flex-direction: column; gap: 1rem; }
 
 .venda-item {
@@ -277,6 +277,258 @@ tr:hover td { background: #fafbff; }
 }
 
 .btn-remove { align-self: center; }
+
+/* ══════════════════════════════════════
+   PDV Layout (Nuvemshop style)
+   ══════════════════════════════════════ */
+
+.pdv-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+    margin: -2rem -1.5rem;
+}
+
+.pdv-left {
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+}
+
+.pdv-right {
+    background: #fff;
+    border-left: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.pdv-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1a1a2e;
+}
+
+/* ── Busca ── */
+.pdv-search {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.pdv-search input {
+    width: 100%;
+    padding: 0.7rem 0.7rem 0.7rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pdv-search input:focus {
+    outline: none;
+    border-color: #4361ee;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.pdv-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+/* ── Lista de produtos ── */
+.pdv-produtos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.pdv-produto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.pdv-produto-item:last-child { border-bottom: none; }
+.pdv-produto-item:hover { background: #f0f4ff; }
+
+.pdv-produto-info { display: flex; flex-direction: column; }
+.pdv-produto-nome { font-weight: 500; font-size: 0.95rem; color: #1a1a2e; }
+.pdv-produto-estoque { font-size: 0.8rem; color: #9ca3af; }
+.pdv-produto-preco { font-weight: 600; color: #4361ee; white-space: nowrap; }
+
+/* ── Ações rápidas ── */
+.pdv-acoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.pdv-acao-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #374151;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+}
+
+.pdv-acao-card:hover {
+    border-color: #4361ee;
+    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.08);
+    text-decoration: none;
+    color: #4361ee;
+}
+
+.pdv-acao-card svg { color: #4361ee; flex-shrink: 0; }
+
+/* ── Carrinho vazio ── */
+.pdv-carrinho-vazio {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+}
+
+.pdv-carrinho-msg { font-size: 1.1rem; font-weight: 600; color: #374151; margin-top: 0.5rem; }
+.pdv-carrinho-sub { font-size: 0.9rem; color: #9ca3af; margin-bottom: 0.75rem; }
+
+/* ── Carrinho itens ── */
+.pdv-carrinho-itens {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.pdv-cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.pdv-cart-item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.pdv-cart-item-nome { font-weight: 500; font-size: 0.95rem; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pdv-cart-item-preco { font-size: 0.8rem; color: #9ca3af; }
+
+.pdv-cart-item-actions { display: flex; align-items: center; gap: 0.35rem; }
+
+.pdv-qty-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #374151;
+    transition: border-color 0.15s;
+}
+.pdv-qty-btn:hover { border-color: #4361ee; color: #4361ee; }
+
+.pdv-qty-value {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.pdv-cart-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 4px;
+    margin-left: 0.25rem;
+    transition: color 0.15s;
+}
+.pdv-cart-remove:hover { color: #e63946; }
+
+.pdv-cart-item-subtotal {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1a1a2e;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* ── Footer do carrinho ── */
+.pdv-carrinho-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pdv-carrinho-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.pdv-total-valor { font-size: 1.25rem; font-weight: 700; color: #1a1a2e; }
+
+.pdv-btn-pagamento {
+    padding: 0.85rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.pdv-btn-pagamento:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── PDV Responsive ── */
+@media (max-width: 860px) {
+    .pdv-layout {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+    .pdv-right {
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+        min-height: 400px;
+    }
+}
 
 /* ──────── Detalhe Venda ──────── */
 .detalhe-info {

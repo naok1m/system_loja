@@ -1,104 +1,203 @@
 {% extends "base.html" %}
-{% block title %}Nova Venda - {{ current_user.nome_loja }}{% endblock %}
+{% block title %}PDV - {{ current_user.nome_loja }}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Nova Venda</h1>
-</div>
-
-{% if produtos %}
 <form method="POST" id="form-venda">
-    <div class="venda-itens" id="itens-container">
-        <div class="venda-item" data-index="0">
-            <div class="form-group">
-                <label>Produto</label>
-                <select name="produto_id" class="produto-select" required onchange="atualizarPreco(this)">
-                    <option value="">Selecione</option>
-                    {% for p in produtos %}
-                    <option value="{{ p.id }}" data-preco="{{ p.preco }}" data-estoque="{{ p.estoque }}">{{ p.nome }} (estoque: {{ p.estoque }})</option>
-                    {% endfor %}
-                </select>
+<div class="pdv-layout">
+    <!-- ═══ PAINEL ESQUERDO ═══ -->
+    <div class="pdv-left">
+        <div class="pdv-section">
+            <h2 class="pdv-title">Buscar produtos</h2>
+            <div class="pdv-search">
+                <svg class="pdv-search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="busca-produto" placeholder="Buscar por nome, descrição ou SKU" autocomplete="off">
             </div>
-            <div class="form-group">
-                <label>Quantidade</label>
-                <input type="number" name="quantidade" min="1" value="1" required onchange="calcularTotal()">
+
+            <!-- Lista de produtos (aparece ao buscar) -->
+            <div id="produtos-lista" class="pdv-produtos-lista">
+                {% for p in produtos %}
+                <div class="pdv-produto-item" data-id="{{ p.id }}" data-nome="{{ p.nome }}" data-preco="{{ p.preco }}" data-estoque="{{ p.estoque }}">
+                    <div class="pdv-produto-info">
+                        <span class="pdv-produto-nome">{{ p.nome }}</span>
+                        <span class="pdv-produto-estoque">Estoque: {{ p.estoque }}</span>
+                    </div>
+                    <span class="pdv-produto-preco">R$ {{ "%.2f"|format(p.preco) }}</span>
+                </div>
+                {% endfor %}
             </div>
-            <div class="form-group">
-                <label>Preço Unit.</label>
-                <input type="text" class="preco-display" readonly value="R$ 0.00">
-            </div>
-            <button type="button" class="btn btn-danger btn-sm btn-remove" onclick="removerItem(this)" style="display:none">X</button>
+        </div>
+
+        <!-- Ações rápidas -->
+        <div class="pdv-acoes">
+            <a href="{{ url_for('produtos.listar') }}" class="pdv-acao-card">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <span>Criar produto</span>
+            </a>
+            <a href="{{ url_for('vendas.listar') }}" class="pdv-acao-card">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <span>Ver vendas</span>
+            </a>
+            <a href="{{ url_for('main.dashboard') }}" class="pdv-acao-card">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Dashboard</span>
+            </a>
         </div>
     </div>
 
-    <div class="venda-actions">
-        <button type="button" class="btn btn-secondary" onclick="adicionarItem()">+ Adicionar Item</button>
-        <div class="venda-total">
-            <strong>Total: R$ <span id="total-display">0.00</span></strong>
+    <!-- ═══ PAINEL DIREITO (CARRINHO) ═══ -->
+    <div class="pdv-right">
+        <h2 class="pdv-title">Carrinho</h2>
+
+        <div id="carrinho-vazio" class="pdv-carrinho-vazio">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#bbb" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            <p class="pdv-carrinho-msg">Carrinho vazio</p>
+            <p class="pdv-carrinho-sub">Faça uma busca para adicionar produtos ao carrinho.</p>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('busca-produto').focus()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Buscar produtos
+            </button>
         </div>
-        <button type="submit" class="btn btn-primary">Registrar Venda</button>
+
+        <div id="carrinho-itens" class="pdv-carrinho-itens" style="display:none"></div>
+
+        <!-- Inputs hidden para envio do form -->
+        <div id="form-hidden-inputs"></div>
+
+        <div class="pdv-carrinho-footer">
+            <div class="pdv-carrinho-total">
+                <span>Total (<span id="total-count">0</span> produtos)</span>
+                <span class="pdv-total-valor">R$<span id="total-display">0,00</span></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block pdv-btn-pagamento" id="btn-pagamento" disabled>
+                Ir para o pagamento
+            </button>
+        </div>
     </div>
+</div>
 </form>
-{% else %}
-<p class="empty">Nenhum produto com estoque disponível. <a href="{{ url_for('produtos.listar') }}">Cadastre produtos</a> primeiro.</p>
-{% endif %}
 {% endblock %}
 
 {% block scripts %}
 <script>
-function getTemplate() {
-    return document.querySelector('.venda-item').cloneNode(true);
-}
+const produtos = [
+    {% for p in produtos %}
+    { id: {{ p.id }}, nome: "{{ p.nome }}", preco: {{ p.preco }}, estoque: {{ p.estoque }} },
+    {% endfor %}
+];
 
-let itemCount = 1;
+const carrinho = [];
 
-function adicionarItem() {
-    const container = document.getElementById('itens-container');
-    const template = getTemplate();
-    template.dataset.index = itemCount++;
-    template.querySelector('.produto-select').value = '';
-    template.querySelector('input[name="quantidade"]').value = 1;
-    template.querySelector('.preco-display').value = 'R$ 0.00';
-    template.querySelector('.btn-remove').style.display = 'inline-block';
-    container.appendChild(template);
-    atualizarBotaoRemover();
-}
+// ── Busca ──
+const buscaInput = document.getElementById('busca-produto');
+const listaEl = document.getElementById('produtos-lista');
 
-function removerItem(btn) {
-    btn.closest('.venda-item').remove();
-    atualizarBotaoRemover();
-    calcularTotal();
-}
-
-function atualizarBotaoRemover() {
-    const itens = document.querySelectorAll('.venda-item');
-    itens.forEach((item, i) => {
-        const btn = item.querySelector('.btn-remove');
-        btn.style.display = itens.length > 1 ? 'inline-block' : 'none';
+buscaInput.addEventListener('input', () => {
+    const termo = buscaInput.value.toLowerCase().trim();
+    const items = listaEl.querySelectorAll('.pdv-produto-item');
+    items.forEach(item => {
+        const nome = item.dataset.nome.toLowerCase();
+        item.style.display = (!termo || nome.includes(termo)) ? 'flex' : 'none';
     });
-}
-
-function atualizarPreco(select) {
-    const option = select.options[select.selectedIndex];
-    const preco = option.dataset.preco || 0;
-    select.closest('.venda-item').querySelector('.preco-display').value = 'R$ ' + parseFloat(preco).toFixed(2);
-    calcularTotal();
-}
-
-function calcularTotal() {
-    let total = 0;
-    document.querySelectorAll('.venda-item').forEach(item => {
-        const select = item.querySelector('.produto-select');
-        const qtd = parseInt(item.querySelector('input[name="quantidade"]').value) || 0;
-        const option = select.options[select.selectedIndex];
-        const preco = parseFloat(option?.dataset?.preco || 0);
-        total += preco * qtd;
-    });
-    document.getElementById('total-display').textContent = total.toFixed(2);
-}
-
-document.querySelectorAll('input[name="quantidade"]').forEach(input => {
-    input.addEventListener('input', calcularTotal);
 });
+
+// ── Adicionar ao carrinho ──
+listaEl.addEventListener('click', (e) => {
+    const item = e.target.closest('.pdv-produto-item');
+    if (!item) return;
+
+    const id = parseInt(item.dataset.id);
+    const nome = item.dataset.nome;
+    const preco = parseFloat(item.dataset.preco);
+    const estoqueMax = parseInt(item.dataset.estoque);
+
+    const existente = carrinho.find(c => c.id === id);
+    if (existente) {
+        if (existente.qtd >= estoqueMax) {
+            alert('Estoque máximo atingido para este produto.');
+            return;
+        }
+        existente.qtd++;
+    } else {
+        if (estoqueMax <= 0) {
+            alert('Produto sem estoque.');
+            return;
+        }
+        carrinho.push({ id, nome, preco, qtd: 1, estoqueMax });
+    }
+    renderCarrinho();
+});
+
+function alterarQtd(id, delta) {
+    const item = carrinho.find(c => c.id === id);
+    if (!item) return;
+    const novaQtd = item.qtd + delta;
+    if (novaQtd <= 0) {
+        carrinho.splice(carrinho.indexOf(item), 1);
+    } else if (novaQtd > item.estoqueMax) {
+        alert('Estoque máximo atingido.');
+        return;
+    } else {
+        item.qtd = novaQtd;
+    }
+    renderCarrinho();
+}
+
+function removerDoCarrinho(id) {
+    const idx = carrinho.findIndex(c => c.id === id);
+    if (idx > -1) carrinho.splice(idx, 1);
+    renderCarrinho();
+}
+
+function renderCarrinho() {
+    const vazioEl = document.getElementById('carrinho-vazio');
+    const itensEl = document.getElementById('carrinho-itens');
+    const hiddenEl = document.getElementById('form-hidden-inputs');
+    const btnPag = document.getElementById('btn-pagamento');
+
+    if (carrinho.length === 0) {
+        vazioEl.style.display = '';
+        itensEl.style.display = 'none';
+        btnPag.disabled = true;
+    } else {
+        vazioEl.style.display = 'none';
+        itensEl.style.display = '';
+        btnPag.disabled = false;
+    }
+
+    let html = '';
+    let hiddenHtml = '';
+    let total = 0;
+    let totalItens = 0;
+
+    carrinho.forEach(item => {
+        const sub = item.preco * item.qtd;
+        total += sub;
+        totalItens += item.qtd;
+
+        html += `
+        <div class="pdv-cart-item">
+            <div class="pdv-cart-item-info">
+                <span class="pdv-cart-item-nome">${item.nome}</span>
+                <span class="pdv-cart-item-preco">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div class="pdv-cart-item-actions">
+                <button type="button" class="pdv-qty-btn" onclick="alterarQtd(${item.id}, -1)">−</button>
+                <span class="pdv-qty-value">${item.qtd}</span>
+                <button type="button" class="pdv-qty-btn" onclick="alterarQtd(${item.id}, 1)">+</button>
+                <button type="button" class="pdv-cart-remove" onclick="removerDoCarrinho(${item.id})">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                </button>
+            </div>
+            <div class="pdv-cart-item-subtotal">R$ ${sub.toFixed(2).replace('.', ',')}</div>
+        </div>`;
+
+        hiddenHtml += `<input type="hidden" name="produto_id" value="${item.id}"><input type="hidden" name="quantidade" value="${item.qtd}">`;
+    });
+
+    itensEl.innerHTML = html;
+    hiddenEl.innerHTML = hiddenHtml;
+    document.getElementById('total-display').textContent = total.toFixed(2).replace('.', ',');
+    document.getElementById('total-count').textContent = totalItens;
+}
 </script>
 {% endblock %}
