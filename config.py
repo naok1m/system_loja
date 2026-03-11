@@ -4,10 +4,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def normalize_database_url(url):
+    url = url.strip()
     if url.startswith('postgres://'):
-        url = url.replace('postgres://', 'postgresql+psycopg://', 1)
-    elif url.startswith('postgresql://'):
-        url = url.replace('postgresql://', 'postgresql+psycopg://', 1)
+        url = 'postgresql+psycopg://' + url[len('postgres://'):]
+    elif url.startswith('postgresql://') and '+' not in url.split('://')[0]:
+        url = 'postgresql+psycopg://' + url[len('postgresql://'):]
     return url
 
 
