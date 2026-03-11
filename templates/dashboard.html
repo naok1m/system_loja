@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - {{ current_user.nome_loja }}{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Bem-vindo, {{ current_user.nome }}!</p>
+</div>
+
+<div class="cards">
+    <div class="card card-blue">
+        <h3>Vendas Hoje</h3>
+        <p class="card-value">R$ {{ "%.2f"|format(vendas_hoje) }}</p>
+    </div>
+    <div class="card card-green">
+        <h3>Vendas no Mês</h3>
+        <p class="card-value">R$ {{ "%.2f"|format(vendas_mes) }}</p>
+    </div>
+    <div class="card card-purple">
+        <h3>Produtos</h3>
+        <p class="card-value">{{ total_produtos }}</p>
+    </div>
+    <div class="card card-orange">
+        <h3>Total de Vendas</h3>
+        <p class="card-value">{{ total_vendas }}</p>
+    </div>
+</div>
+
+<div class="chart-container">
+    <h2>Vendas dos Últimos 7 Dias</h2>
+    <canvas id="vendasChart"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const ctx = document.getElementById('vendasChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|tojson }},
+            datasets: [{
+                label: 'Vendas (R$)',
+                data: {{ valores|tojson }},
+                backgroundColor: 'rgba(67, 97, 238, 0.6)',
+                borderColor: 'rgba(67, 97, 238, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toFixed(2);
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

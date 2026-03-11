@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Produtos - {{ current_user.nome_loja }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Produtos</h1>
+    <button class="btn btn-primary" onclick="document.getElementById('modal-novo').style.display='flex'">Novo Produto</button>
+</div>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in produtos %}
+            <tr>
+                <td>{{ p.nome }}</td>
+                <td>R$ {{ "%.2f"|format(p.preco) }}</td>
+                <td>{{ p.estoque }}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-secondary" onclick="abrirEditar({{ p.id }}, '{{ p.nome }}', {{ p.preco }}, {{ p.estoque }})">Editar</button>
+                    <form method="POST" action="{{ url_for('produtos.excluir', id=p.id) }}" style="display:inline" onsubmit="return confirm('Excluir este produto?')">
+                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not produtos %}
+            <tr><td colspan="4" class="empty">Nenhum produto cadastrado.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Novo Produto -->
+<div id="modal-novo" class="modal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content">
+        <h2>Novo Produto</h2>
+        <form method="POST" action="{{ url_for('produtos.criar') }}">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" name="preco" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label>Estoque</label>
+                <input type="number" name="estoque" min="0" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('modal-novo').style.display='none'">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Editar Produto -->
+<div id="modal-editar" class="modal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content">
+        <h2>Editar Produto</h2>
+        <form method="POST" id="form-editar">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" name="nome" id="edit-nome" required>
+            </div>
+            <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" name="preco" id="edit-preco" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label>Estoque</label>
+                <input type="number" name="estoque" id="edit-estoque" min="0" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('modal-editar').style.display='none'">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function abrirEditar(id, nome, preco, estoque) {
+    document.getElementById('edit-nome').value = nome;
+    document.getElementById('edit-preco').value = preco;
+    document.getElementById('edit-estoque').value = estoque;
+    document.getElementById('form-editar').action = '/produtos/editar/' + id;
+    document.getElementById('modal-editar').style.display = 'flex';
+}
+</script>
+{% endblock %}

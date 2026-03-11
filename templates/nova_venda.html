@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Nova Venda - {{ current_user.nome_loja }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Nova Venda</h1>
+</div>
+
+{% if produtos %}
+<form method="POST" id="form-venda">
+    <div class="venda-itens" id="itens-container">
+        <div class="venda-item" data-index="0">
+            <div class="form-group">
+                <label>Produto</label>
+                <select name="produto_id" class="produto-select" required onchange="atualizarPreco(this)">
+                    <option value="">Selecione</option>
+                    {% for p in produtos %}
+                    <option value="{{ p.id }}" data-preco="{{ p.preco }}" data-estoque="{{ p.estoque }}">{{ p.nome }} (estoque: {{ p.estoque }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Quantidade</label>
+                <input type="number" name="quantidade" min="1" value="1" required onchange="calcularTotal()">
+            </div>
+            <div class="form-group">
+                <label>Preço Unit.</label>
+                <input type="text" class="preco-display" readonly value="R$ 0.00">
+            </div>
+            <button type="button" class="btn btn-danger btn-sm btn-remove" onclick="removerItem(this)" style="display:none">X</button>
+        </div>
+    </div>
+
+    <div class="venda-actions">
+        <button type="button" class="btn btn-secondary" onclick="adicionarItem()">+ Adicionar Item</button>
+        <div class="venda-total">
+            <strong>Total: R$ <span id="total-display">0.00</span></strong>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar Venda</button>
+    </div>
+</form>
+{% else %}
+<p class="empty">Nenhum produto com estoque disponível. <a href="{{ url_for('produtos.listar') }}">Cadastre produtos</a> primeiro.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getTemplate() {
+    return document.querySelector('.venda-item').cloneNode(true);
+}
+
+let itemCount = 1;
+
+function adicionarItem() {
+    const container = document.getElementById('itens-container');
+    const template = getTemplate();
+    template.dataset.index = itemCount++;
+    template.querySelector('.produto-select').value = '';
+    template.querySelector('input[name="quantidade"]').value = 1;
+    template.querySelector('.preco-display').value = 'R$ 0.00';
+    template.querySelector('.btn-remove').style.display = 'inline-block';
+    container.appendChild(template);
+    atualizarBotaoRemover();
+}
+
+function removerItem(btn) {
+    btn.closest('.venda-item').remove();
+    atualizarBotaoRemover();
+    calcularTotal();
+}
+
+function atualizarBotaoRemover() {
+    const itens = document.querySelectorAll('.venda-item');
+    itens.forEach((item, i) => {
+        const btn = item.querySelector('.btn-remove');
+        btn.style.display = itens.length > 1 ? 'inline-block' : 'none';
+    });
+}
+
+function atualizarPreco(select) {
+    const option = select.options[select.selectedIndex];
+    const preco = option.dataset.preco || 0;
+    select.closest('.venda-item').querySelector('.preco-display').value = 'R$ ' + parseFloat(preco).toFixed(2);
+    calcularTotal();
+}
+
+function calcularTotal() {
+    let total = 0;
+    document.querySelectorAll('.venda-item').forEach(item => {
+        const select = item.querySelector('.produto-select');
+        const qtd = parseInt(item.querySelector('input[name="quantidade"]').value) || 0;
+        const option = select.options[select.selectedIndex];
+        const preco = parseFloat(option?.dataset?.preco || 0);
+        total += preco * qtd;
+    });
+    document.getElementById('total-display').textContent = total.toFixed(2);
+}
+
+document.querySelectorAll('input[name="quantidade"]').forEach(input => {
+    input.addEventListener('input', calcularTotal);
+});
+</script>
+{% endblock %}

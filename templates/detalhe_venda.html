@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Venda #{{ venda.id }} - {{ current_user.nome_loja }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Venda #{{ venda.id }}</h1>
+    <a href="{{ url_for('vendas.listar') }}" class="btn btn-secondary">Voltar</a>
+</div>
+
+<div class="detalhe-info">
+    <p><strong>Data:</strong> {{ venda.criado_em.strftime('%d/%m/%Y %H:%M') }}</p>
+    <p><strong>Total:</strong> R$ {{ "%.2f"|format(venda.total) }}</p>
+</div>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Qtd</th>
+                <th>Preço Unit.</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in venda.itens %}
+            <tr>
+                <td>{{ item.produto.nome }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>R$ {{ "%.2f"|format(item.preco_unitario) }}</td>
+                <td>R$ {{ "%.2f"|format(item.subtotal) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
