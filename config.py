@@ -24,5 +24,11 @@ class Config:
         )
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,   # testa a conexão antes de usar; evita erros após hibernação
+        'pool_recycle': 280,     # recicla conexões a cada ~5min (evita timeout do Postgres)
+        'pool_size': 3,
+        'max_overflow': 2,
+    }
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
