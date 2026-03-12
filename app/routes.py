@@ -1,14 +1,23 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, Produto, Venda, ItemVenda
 from datetime import datetime, timedelta
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 auth_bp = Blueprint('auth', __name__)
 main_bp = Blueprint('main', __name__)
 produtos_bp = Blueprint('produtos', __name__, url_prefix='/produtos')
 vendas_bp = Blueprint('vendas', __name__, url_prefix='/vendas')
+
+
+@main_bp.route('/health')
+def health():
+    try:
+        db.session.execute(text('SELECT 1'))
+        return jsonify(status='ok', db='connected'), 200
+    except Exception as e:
+        return jsonify(status='error', db=str(e)), 500
 
 
 # ──────────────────────────── AUTH ────────────────────────────
