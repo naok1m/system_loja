@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
+login_manager.login_view = 'auth.login' # type: ignore
 login_manager.login_message = 'Faça login para acessar esta página.'
 
 
@@ -60,9 +60,26 @@ def create_app():
     with app.app_context():
         try:
             db.create_all()
+            _apply_migrations(app)
             logger.info('Tabelas criadas/verificadas com sucesso.')
         except Exception:
             logger.exception('Erro ao criar tabelas no banco de dados.')
             raise
 
     return app
+
+
+def _apply_migrations(app):
+    """Adiciona colunas que faltam em tabelas já existentes."""
+    from sqlalchemy import text, inspect
+
+    with db.engine.connect() as conn:
+        inspector = inspect(db.engine)
+        columns = [c['name'] for c in inspector.get_columns('venda')]
+
+        if 'forma_pagamento' not in columns:
+            logger.info('Migrando: adicionando coluna forma_pagamento à tabela venda')
+            conn.execute(text(
+                "ALTER TABLE venda ADD COLUMN forma_pagamento VARCHAR(30) NOT NULL DEFAULT 'dinheiro'"
+            ))
+            conn.commit()
